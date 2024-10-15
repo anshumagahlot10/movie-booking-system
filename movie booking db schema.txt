@@ -1,0 +1,103 @@
+Table Name: users
+Fields:
+user_id (Primary Key)
+username (Unique)
+password_hash
+email (Unique)
+phone_number
+created_at
+updated_at
+
+Movies:
+
+Table Name: movies
+Fields:
+movie_id (Primary Key)
+title
+description
+duration (in minutes)
+release_date
+rating (e.g., 1 to 5)
+genre
+created_at
+updated_at
+Theaters:
+
+Table Name: theaters
+Fields:
+theater_id (Primary Key)
+name
+location
+total_screens
+created_at
+updated_at
+Screens:
+
+Table Name: screens
+Fields:
+screen_id (Primary Key)
+theater_id (Foreign Key)
+screen_number
+seat_capacity
+created_at
+updated_at
+Showtimes:
+
+Table Name: showtimes
+Fields:
+showtime_id (Primary Key)
+movie_id (Foreign Key)
+screen_id (Foreign Key)
+start_time
+end_time
+created_at
+updated_at
+Bookings:
+
+Table Name: bookings
+Fields:
+booking_id (Primary Key)
+user_id (Foreign Key)
+showtime_id (Foreign Key)
+booking_time
+total_amount
+status (e.g., confirmed, canceled)
+created_at
+updated_at
+Seats:
+
+Table Name: seats
+Fields:
+seat_id (Primary Key)
+screen_id (Foreign Key)
+seat_number
+is_available (Boolean)
+created_at
+updated_at
+Booking_Seats:
+
+Table Name: booking_seats
+Fields:
+booking_seat_id (Primary Key)
+booking_id (Foreign Key)
+seat_id (Foreign Key)
+Payments:
+
+Table Name: payments
+Fields:
+payment_id (Primary Key)
+booking_id (Foreign Key)
+amount
+payment_method (e.g., credit card, PayPal)
+payment_status (e.g., successful, failed)
+created_at
+updated_at
+
+
+relationships Between Tables
+Users can have multiple Bookings.
+Movies can have multiple Showtimes.
+Theaters can have multiple Screens.
+Screens can have multiple Showtimes and Seats.
+Bookings can reference multiple Seats through Booking_Seats.
+Payments are linked to Bookings.
