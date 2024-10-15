@@ -17,9 +17,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<String> registerUser(String name,String username,String password,String email,String phone) {
+    public void registerUser(String name,String username,String password,String email,String phone) {
         if (userRepository.findByEmail(email).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
+            throw new RuntimeException("User already exists");
         }
         
         User user = User.builder()
@@ -31,6 +31,5 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
-        return ResponseEntity.ok("User registered successfully");
     }
 }
