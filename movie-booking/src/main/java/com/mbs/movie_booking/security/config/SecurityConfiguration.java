@@ -58,17 +58,15 @@ public static final String SWAGGER_UI_URL = "/swagger-ui/**";
                 .authorizeHttpRequests(authorize -> {
                     authorize.requestMatchers(ALLOWED_URLS).permitAll();
                     authorize.requestMatchers("/api/auth/login").permitAll();
-                    authorize.requestMatchers("/api/**").permitAll();
+                    authorize.requestMatchers("/api/register").permitAll();
                     authorize.requestMatchers("/api/auth/refresh").permitAll();
                     authorize.requestMatchers("/api/auth/logout").authenticated();
                  
                     authorize.anyRequest().authenticated();
                 });
         http
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint));
-        http
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
 //                .formLogin(login -> login.loginProcessingUrl("/api/auth/login"))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

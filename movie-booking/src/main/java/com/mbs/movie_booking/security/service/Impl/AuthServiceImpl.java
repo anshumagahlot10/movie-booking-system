@@ -125,9 +125,10 @@ public class AuthServiceImpl implements AuthService {
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        // System.out.println(SecurityContextHolder.getContext().getAuthentication());
 
         LoginResponse loginResponse = new LoginResponse(true, "ROLE_USER");
-        System.out.println("access token:" + newAccessToken + "refresh token" + newRefreshToken);
+        // System.out.println("access token:" + newAccessToken + "refresh token" + newRefreshToken);
 
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
     }
@@ -156,7 +157,7 @@ public class AuthServiceImpl implements AuthService {
         addAccessTokenCookie(responseHeaders, newAccessToken);
        
         LoginResponse loginResponse = new LoginResponse(true, "ROLE_USER");
-        System.out.println("new access token:" + newAccessToken + "refresh token" + refreshToken);
+        // System.out.println("new access token:" + newAccessToken + "refresh token" + refreshToken);
 
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
     }
@@ -196,11 +197,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void addAccessTokenCookie(HttpHeaders httpHeaders, Token token) {
+        System.out.println("access token cookie caalled");
         httpHeaders.add(HttpHeaders.SET_COOKIE,
                 cookieUtil.createAccessTokenCookie(token.getValue(), accessTokenDurationSecond).toString());
     }
 
     private void addRefreshTokenCookie(HttpHeaders httpHeaders, Token token) {
+        System.out.println("refrsh token cookie caalled");
         httpHeaders.add(HttpHeaders.SET_COOKIE,
                 cookieUtil.createRefreshTokenCookie(token.getValue(), refreshTokenDurationSecond).toString());
     }
