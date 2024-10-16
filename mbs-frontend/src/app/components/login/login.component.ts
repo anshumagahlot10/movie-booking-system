@@ -79,7 +79,7 @@ export class LoginComponent implements OnInit{
       this.userService.loginUser(loginRequest).subscribe({
           next: (response: LoginResponse) => {
               if (response.isLogged) {
-                  this.router.navigate(['/']);
+                  this.router.navigate(['/dashboard']);
                   console.log("Login Successful")
               } else {
                   this.errorMessage = 'Login failed. Please try again.';

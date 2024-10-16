@@ -1,0 +1,18 @@
+<div class="prelogin-form">
+    <div class="my-4">
+        <h4>Welcome , {{user.name}}!</h4>
+        <p>Here is your dashboard</p>
+    </div>
+    <div>
+        <div class="dashboard-info">
+            <h5>Your Details:</h5>
+            <p><strong>Email:</strong> {{user.email}}</p>
+            <p><strong>Username:</strong> {{user.username}}</p>
+            <p><strong>Phone:</strong> {{user.phone}}</p>
+        </div>
+
+        <button class="btn btn-danger button-xl w-100" (click)="onLogout()">
+            <b>Logout</b>
+        </button>
+    </div>
+</div>

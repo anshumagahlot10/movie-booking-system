@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.mbs.movie_booking.enums.TokenType;
@@ -29,6 +30,7 @@ import com.mbs.movie_booking.security.jwt.JwtTokenProvider;
 import com.mbs.movie_booking.security.service.AuthService;
 import com.mbs.movie_booking.security.util.CookieUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -163,35 +165,31 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<LoginResponse> logout(String accessToken, String refreshToken) {
+    public ResponseEntity<LoginResponse> logout(HttpServletRequest request) {
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("No user is currently logged in.");
+        }
+    
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+    
+        // If user is found, delete all tokens for that user
+        if (user != null) {
+            tokenRepository.deleteAllTokensByUserId(user.getUserID());
+            System.out.println("All tokens deleted for user: " + user.getUsername());
+        }
+    
+        // Clear security context
         SecurityContextHolder.clearContext();
-
-        String username = tokenProvider.getUsernameFromToken(accessToken);
-        User user = userRepository.findByEmail(username).orElseThrow(
-                () -> new ResourceNotFoundException("User not found"));
-
-        Token access_token = tokenRepository.findByValue(accessToken).orElseThrow(
-                () -> new ResourceNotFoundException("Access Token not found"));
-
-        Token refresh_token = tokenRepository.findByValue(refreshToken).orElseThrow(
-                () -> new ResourceNotFoundException("Refresh Token not found"));
-        revokeAllTokenOfUser(user);
-
+    
         HttpHeaders responseHeaders = new HttpHeaders();
-
         responseHeaders.add(HttpHeaders.SET_COOKIE, cookieUtil.deleteAccessTokenCookie().toString());
         responseHeaders.add(HttpHeaders.SET_COOKIE, cookieUtil.deleteRefreshTokenCookie().toString());
-
-        tokenRepository.delete(access_token);
-        tokenRepository.delete(refresh_token);
-        
-        System.out.println("tokens deleted");
-
+    
         LoginResponse loginResponse = new LoginResponse(false, null);
-
-        System.out.println("logout successful");
-
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
 
     }

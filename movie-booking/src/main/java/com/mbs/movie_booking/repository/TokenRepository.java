@@ -17,5 +17,10 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     @Transactional
     @Query("DELETE FROM Token t WHERE t.user.username = ?1 AND t.type = ?2")
     void deleteAccessTokenByUsername(String username, TokenType type);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Token t WHERE t.user.id = ?1")
+    void deleteAllTokensByUserId(Long userId);
 }
 

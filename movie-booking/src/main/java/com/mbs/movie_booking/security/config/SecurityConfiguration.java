@@ -60,8 +60,7 @@ public static final String SWAGGER_UI_URL = "/swagger-ui/**";
                     authorize.requestMatchers("/api/auth/login").permitAll();
                     authorize.requestMatchers("/api/register").permitAll();
                     authorize.requestMatchers("/api/auth/refresh").permitAll();
-                    authorize.requestMatchers("/api/auth/logout").authenticated();
-                 
+                   
                     authorize.anyRequest().authenticated();
                 });
         http

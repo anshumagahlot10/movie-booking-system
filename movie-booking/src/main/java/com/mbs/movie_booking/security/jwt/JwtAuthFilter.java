@@ -39,8 +39,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         System.out.println(accessToken);
 
         if(accessToken == null || !tokenProvider.validateToken(accessToken)) {
-
-            System.out.println("Ujwal");    
             filterChain.doFilter(request, response);
             return;
         }
