@@ -45,17 +45,11 @@ public class UserService {
             throw new RuntimeException("No user is currently logged in.");
         }
 
-        System.out.println(authentication.getPrincipal());
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
 
-        // String email = authentication.getName(); // Assuming email is used as the principal
-        // System.out.println("GetName(): " + authentication.getName());
-        // Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        // return optionalUser.orElseThrow(() -> new RuntimeException("User not found")); // Handle user not found case
         return user;
     }
 }

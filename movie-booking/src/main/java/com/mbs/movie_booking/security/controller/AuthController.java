@@ -26,17 +26,9 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
     private final AuthService authService;
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
-            @CookieValue(name = "access_token", required = false) String accessToken,
-            @CookieValue(name = "refresh_token", required = false) String refreshToken,
-            @RequestBody LoginRequest loginRequest) {
-        return authService.login(loginRequest, accessToken, refreshToken);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        return authService.login(loginRequest);
     }
-
-    // @PostMapping("/refresh")
-    // public ResponseEntity<LoginResponse> refreshToken(@CookieValue(name = "refresh_token", required = true) String refreshToken) {
-    //     return authService.refresh(refreshToken);
-    // }
 
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refreshToken(
@@ -44,22 +36,9 @@ public class AuthController {
         return authService.refresh(refreshToken);
 }
 
-   
-    // @PostMapping("/logout")
-    // public ResponseEntity<LoginResponse> logout(
-    //         @RequestHeader(name = "access_token", required = false) String accessToken,
-    //         @RequestHeader(name = "refresh_token", required = false) String refreshToken) {
-    //     return authService.logout(accessToken, refreshToken);
-    // }
-
     @PostMapping("/logout")
     public ResponseEntity<LoginResponse> logout(HttpServletRequest request){
         return authService.logout(request); 
     }
 
-    //  @PreAuthorize("isAuthenticated()")
-    // @GetMapping("/info")
-    // public ResponseEntity<UserLoggedDto> userLoggedInfo() {
-    //     return ResponseEntity.ok(authService.getUserLoggedInfo());
-    // }
 }

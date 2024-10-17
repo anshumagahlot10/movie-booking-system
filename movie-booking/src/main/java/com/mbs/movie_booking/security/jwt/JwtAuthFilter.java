@@ -36,8 +36,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken  = getJwtToken(request, true);
 
-        System.out.println(accessToken);
-
         if(accessToken == null || !tokenProvider.validateToken(accessToken)) {
             filterChain.doFilter(request, response);
             return;
@@ -52,7 +50,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        System.out.println(userDetails.getUsername());
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 userDetails,
                 null,

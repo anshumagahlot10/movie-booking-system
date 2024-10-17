@@ -5,11 +5,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,87 +54,52 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public ResponseEntity<LoginResponse> login(LoginRequest loginRequest, String accessToken, String refreshToken) {
+    public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.email(), loginRequest.password()));
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+    if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        
+        if (userDetails.getUsername().equals(loginRequest.email())) {
+            throw new RuntimeException("User is currently logged in.");
+        }
+    }
+
+        Authentication currAuth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginRequest.email(), loginRequest.password()));
         String email = loginRequest.email();
-
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
-
-        boolean accessTokenValid = tokenProvider.validateToken(accessToken);
-        boolean refreshTokenValid = tokenProvider.validateToken(refreshToken);
-
         HttpHeaders responseHeaders = new HttpHeaders(); // Prepares headers to send back the tokens in cookies.
         Token newAccessToken = null;
         Token newRefreshToken = null;
 
-        revokeAllTokenOfUser(user);
+        newAccessToken = tokenProvider.generateAccessToken(
+                Map.of("role", "ROLE_USER"),
+                accessTokenDurationMinute,
+                ChronoUnit.MINUTES,
+                user);
 
-        if (!accessTokenValid && !refreshTokenValid) {
-            newAccessToken = tokenProvider.generateAccessToken(
-                    Map.of("role", "ROLE_USER"),
-                    accessTokenDurationMinute,
-                    ChronoUnit.MINUTES,
-                    user);
+        newRefreshToken = tokenProvider.generateRefreshToken(
+                refreshTokenDurationDay,
+                ChronoUnit.DAYS,
+                user);
 
-            newRefreshToken = tokenProvider.generateRefreshToken(
-                    refreshTokenDurationDay,
-                    ChronoUnit.DAYS,
-                    user);
+        newAccessToken.setUser(user);
+        newRefreshToken.setUser(user);
 
-            newAccessToken.setUser(user);
-            newRefreshToken.setUser(user);
+        tokenRepository.saveAll(List.of(newAccessToken, newRefreshToken));
 
-            // save tokens in db
-            tokenRepository.saveAll(List.of(newAccessToken, newRefreshToken));
+        addAccessTokenCookie(responseHeaders, newAccessToken);
+        addRefreshTokenCookie(responseHeaders, newRefreshToken);
 
-            addAccessTokenCookie(responseHeaders, newAccessToken);
-            addRefreshTokenCookie(responseHeaders, newRefreshToken);
-        }
-
-        if (!accessTokenValid && refreshTokenValid) {
-            newAccessToken = tokenProvider.generateAccessToken(
-                    Map.of("role", "ROLE_USER"),
-                    accessTokenDurationMinute,
-                    ChronoUnit.MINUTES,
-                    user);
-
-            addAccessTokenCookie(responseHeaders, newAccessToken);
-        }
-
-        if (accessTokenValid && refreshTokenValid) {
-            newAccessToken = tokenProvider.generateAccessToken(
-                    Map.of("role", "ROLE_USER"),
-                    accessTokenDurationMinute,
-                    ChronoUnit.MINUTES,
-                    user);
-
-            newRefreshToken = tokenProvider.generateRefreshToken(
-                    refreshTokenDurationDay,
-                    ChronoUnit.DAYS,
-                    user);
-
-            newAccessToken.setUser(user);
-            newRefreshToken.setUser(user);
-
-            // save tokens in db
-            tokenRepository.saveAll(List.of(newAccessToken, newRefreshToken));
-
-            addAccessTokenCookie(responseHeaders, newAccessToken);
-            addRefreshTokenCookie(responseHeaders, newRefreshToken);
-        }
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        // System.out.println(SecurityContextHolder.getContext().getAuthentication());
+        SecurityContextHolder.getContext().setAuthentication(currAuth);
 
         LoginResponse loginResponse = new LoginResponse(true, "ROLE_USER");
-        // System.out.println("access token:" + newAccessToken + "refresh token" + newRefreshToken);
 
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
+
     }
 
     @Override
@@ -145,7 +112,7 @@ public class AuthServiceImpl implements AuthService {
         String username = tokenProvider.getUsernameFromToken(refreshToken);
         User user = userRepository.findByEmail(username).orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
-        tokenRepository.deleteAccessTokenByUsername(username, TokenType.ACCESS); 
+        tokenRepository.deleteAccessTokenByUsername(username, TokenType.ACCESS);
 
         Token newAccessToken = tokenProvider.generateAccessToken(
                 Map.of("role", "ROLE_USER"),
@@ -154,12 +121,11 @@ public class AuthServiceImpl implements AuthService {
                 user);
         newAccessToken.setUser(user);
         tokenRepository.save(newAccessToken);
-        
+
         HttpHeaders responseHeaders = new HttpHeaders();
         addAccessTokenCookie(responseHeaders, newAccessToken);
-       
+
         LoginResponse loginResponse = new LoginResponse(true, "ROLE_USER");
-        // System.out.println("new access token:" + newAccessToken + "refresh token" + refreshToken);
 
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
     }
@@ -172,52 +138,34 @@ public class AuthServiceImpl implements AuthService {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("No user is currently logged in.");
         }
-    
+
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
-    
-        // If user is found, delete all tokens for that user
+
         if (user != null) {
             tokenRepository.deleteAllTokensByUserId(user.getUserID());
-            System.out.println("All tokens deleted for user: " + user.getUsername());
         }
-    
+
         // Clear security context
         SecurityContextHolder.clearContext();
-    
+
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add(HttpHeaders.SET_COOKIE, cookieUtil.deleteAccessTokenCookie().toString());
         responseHeaders.add(HttpHeaders.SET_COOKIE, cookieUtil.deleteRefreshTokenCookie().toString());
-    
+
         LoginResponse loginResponse = new LoginResponse(false, null);
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
 
     }
 
     private void addAccessTokenCookie(HttpHeaders httpHeaders, Token token) {
-        System.out.println("access token cookie caalled");
         httpHeaders.add(HttpHeaders.SET_COOKIE,
                 cookieUtil.createAccessTokenCookie(token.getValue(), accessTokenDurationSecond).toString());
     }
 
     private void addRefreshTokenCookie(HttpHeaders httpHeaders, Token token) {
-        System.out.println("refrsh token cookie caalled");
         httpHeaders.add(HttpHeaders.SET_COOKIE,
                 cookieUtil.createRefreshTokenCookie(token.getValue(), refreshTokenDurationSecond).toString());
-    }
-
-    private void revokeAllTokenOfUser(User user) {
-        // get all user tokens
-        Set<Token> tokens = user.getTokens();
-
-        tokens.forEach(token -> {
-            if (token.getExpiryDate().isBefore(LocalDateTime.now()))
-                tokenRepository.delete(token);
-            else if (!token.isDisabled()) {
-                token.setDisabled(true);
-                tokenRepository.save(token);
-            }
-        });
     }
 
 }
