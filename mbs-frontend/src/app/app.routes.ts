@@ -9,9 +9,8 @@ export const routes: Routes = [
     {path: '', component: SideImageLayoutComponent,
       children: [
         {path: 'login', component: LoginComponent},
-        {path: 'register', component: RegisterComponent},
-        {path: 'dashboard', component: DashboardComponent}
+        {path: 'register', component: RegisterComponent}
       ]
-      }
-    // {path: ''}
+      },
+     {path: 'dashboard', component: DashboardComponent}
 ];
