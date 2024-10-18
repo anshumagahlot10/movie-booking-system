@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mbs.movie_booking.DTO.UserRegister;
+import com.mbs.movie_booking.dto.UserRegisterInfo;
 import com.mbs.movie_booking.models.User;
 import com.mbs.movie_booking.service.UserService;
 
@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")
@@ -25,7 +24,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRegister userRegister) {
+    public ResponseEntity<?> register(@RequestBody UserRegisterInfo userRegister) {
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("messege", "User registered successfully" );
         userService.registerUser(

@@ -1,9 +1,9 @@
-package com.mbs.movie_booking.DTO;
+package com.mbs.movie_booking.dto;
 
 import lombok.Data;
 
 @Data
-public class UserRegister {
+public class UserRegisterInfo {
     private String name;
     private String username;
     private String password;
