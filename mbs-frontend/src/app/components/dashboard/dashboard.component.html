@@ -49,13 +49,19 @@
         </div>
       </div>
       
-      <button *ngIf="!isEditing" class="btn btn-secondary" (click)="toggleEdit()">
-        Edit
-      </button>
+      <div class="d-flex justify-content-between mt-3">
+        <button *ngIf="!isEditing" class="btn btn-secondary btn-sm" (click)="toggleEdit()">
+          Edit
+        </button>
+        
+        <div class="text-end">
+          <button class="btn btn-danger btn-sm" (click)="onLogout()">
+            <b>Logout</b>
+          </button>
+        </div>
+      </div>
       
-      <button class="btn btn-danger button-xl w-100" (click)="onLogout()">
-        <b>Logout</b>
-    </button>
+
       <!-- Full Form Section -->
       <form *ngIf="isEditing" [formGroup]="profileForm" (ngSubmit)="onFormSubmit()">
         <div class="mb-3">
