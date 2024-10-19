@@ -35,7 +35,13 @@ export class RegisterComponent {
       username:['',Validators.required],
       email: ['', [Validators.required, customEmailValidator()]],
       phone: ['', [Validators.required]], // Added phone field
-      password: ['', [Validators.required, noWhitespaceValidator('Password', 4, 20)]]
+      // password: ['', [Validators.required, noWhitespaceValidator('Password', 4, 20)]]
+
+      password: ['', [
+        Validators.required,
+        Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!*()]).{6,}$/)
+      ]],
+      
     });
   }
 

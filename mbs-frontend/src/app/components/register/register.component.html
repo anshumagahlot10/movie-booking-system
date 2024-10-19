@@ -1,9 +1,9 @@
 <div class="prelogin-form">
   <div class="my-4">
-    <h4>Sign Up to Movies </h4>
+    <h4>Sign Up to Movies</h4>
     <p>Create your account</p>
   </div>
-  <div class="">
+  <div>
     <form (ngSubmit)="onSubmit()" [formGroup]="userData">
       <div class="login-form-div">
 
@@ -16,7 +16,7 @@
             Name is required.
           </div>
         </div>
-        <!-- Username Field -->
+
         <div class="mb-4 position-relative">
           <input type="text" class="form-control ps__40" id="username" placeholder="Username" name="username"
             formControlName="username"
@@ -27,6 +27,7 @@
             Username is required.
           </div>
         </div>
+
         <div class="mb-4 position-relative">
           <input type="email" class="form-control ps__40" id="email" placeholder="Email" name="email"
             formControlName="email"
@@ -48,10 +49,9 @@
         <div class="mb-4 position-relative">
           <input type="text" class="form-control ps__40" id="phone" placeholder="Phone" name="phone"
             formControlName="phone"
-            [ngClass]="{ 'validation-input': userData.get('phone')?.invalid && userData.get('phone')?.touched}" />
+            [ngClass]="{ 'validation-input': userData.get('phone')?.invalid && userData.get('phone')?.touched }" />
           <i class="bi bi-phone login-input-icon"></i>
-          <div *ngIf="userData.get('phone')?.hasError('required') && userData.get('phone')?.touched"
-            class="validation-text">
+          <div *ngIf="userData.get('phone')?.hasError('required') && userData.get('phone')?.touched" class="validation-text">
             Phone is required.
           </div>
         </div>
@@ -59,7 +59,7 @@
         <div class="mb-4 position-relative">
           <input type="{{ passwordFieldType }}" class="form-control ps__40 pe-5" id="password" placeholder="Password"
             name="password" formControlName="password"
-            [ngClass]="{ 'validation-input': userData.get('password')?.invalid && userData.get('password')?.touched}" />
+            [ngClass]="{ 'validation-input': userData.get('password')?.invalid && userData.get('password')?.touched }" />
           <i class="bi bi-lock login-input-icon"></i>
           <div class="passwor_show_icon" (click)="togglePasswordVisibility()">
             <i class="bi bi-eye-fill" *ngIf="passwordFieldType=='password'"></i>
@@ -67,17 +67,21 @@
           </div>
           <div class="validation-text"
             *ngIf="userData.get('password')?.hasError('required') && userData.get('password')?.touched">
-            Password is required
+            Password is required.
+          </div>
+          <div class="validation-text"
+            *ngIf="userData.get('password')?.hasError('pattern') && userData.get('password')?.touched">
+            Password must be at least 6 characters long and contain uppercase letters, lowercase letters, numbers, and special characters.
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary button-xl w-100"><b>Register</b></button>
+        <button type="submit" class="btn btn-primary button-xl w-100" [disabled]="userData.invalid"><b>Register</b></button>
 
       </div>
     </form>
 
     <div class="text-center act-text">
-      <p> Already have an account? <a class="font-weight-500 ps-1 text-blue" routerLink="/login">Sign In</a></p>
+      <p>Already have an account? <a class="font-weight-500 ps-1 text-blue" routerLink="/login">Sign In</a></p>
     </div>
   </div>
 </div>

@@ -1,38 +1,55 @@
 package com.mbs.movie_booking.service;
 
-import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import com.mbs.movie_booking.dto.UserRegisterInfo;
 import com.mbs.movie_booking.models.User;
 import com.mbs.movie_booking.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
+//     public void registerUser(user ) {
+//         if (userRepository.findByEmail(email).isPresent()) {
+//             throw new RuntimeException("User already exists");
+//         }
+
+//         User user = User.builder()
+//                 .name(name)
+//                 .username(username)
+//                 .password(passwordEncoder.encode(password))
+//                 .email(email)
+//                 .phone(phone)
+//                 .build();
+
+//         userRepository.save(user);
+//     }
+
 @Service
 @RequiredArgsConstructor
+@Validated
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void registerUser(String name, String username, String password, String email, String phone) {
-        if (userRepository.findByEmail(email).isPresent()) {
+    public void registerUser(UserRegisterInfo userRegisterInfo) {
+        System.out.println(userRegisterInfo);
+        if (userRepository.findByEmail(userRegisterInfo.getEmail()).isPresent()) {
             throw new RuntimeException("User already exists");
         }
 
         User user = User.builder()
-                .name(name)
-                .username(username)
-                .password(passwordEncoder.encode(password))
-                .email(email)
-                .phone(phone)
+                .name(userRegisterInfo.getName())
+                .username(userRegisterInfo.getUsername())
+                .password(passwordEncoder.encode(userRegisterInfo.getPassword()))
+                .email(userRegisterInfo.getEmail())
+                .phone(userRegisterInfo.getPhone())
                 .build();
 
         userRepository.save(user);
@@ -44,7 +61,6 @@ public class UserService {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("No user is currently logged in.");
         }
-
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 

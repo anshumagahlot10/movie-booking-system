@@ -1,5 +1,6 @@
 package com.mbs.movie_booking.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,10 +12,9 @@ import com.mbs.movie_booking.dto.UserRegisterInfo;
 import com.mbs.movie_booking.models.User;
 import com.mbs.movie_booking.service.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -24,16 +24,11 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRegisterInfo userRegister) {
-        Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("messege", "User registered successfully" );
-        userService.registerUser(
-            userRegister.getName(),
-            userRegister.getUsername(),
-            userRegister.getPassword(), 
-            userRegister.getEmail(),
-            userRegister.getPhone());
-        return ResponseEntity.ok(responseBody);
+    public ResponseEntity<String> register(@Valid @RequestBody UserRegisterInfo userRegister) {
+
+        System.out.println(userRegister);
+        userService.registerUser(userRegister);
+        return new ResponseEntity<String>(HttpStatus.CREATED);
     }
 
     @GetMapping("/user")
