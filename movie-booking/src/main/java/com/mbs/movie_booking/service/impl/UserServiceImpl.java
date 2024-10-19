@@ -23,7 +23,6 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     public void registerUser(UserRegisterInfo userRegisterInfo) {
-        System.out.println(userRegisterInfo);
         if (userRepository.findByEmail(userRegisterInfo.getEmail()).isPresent()) {
             throw new RuntimeException("User already exists");
         }

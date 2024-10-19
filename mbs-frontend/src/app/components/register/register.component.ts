@@ -31,11 +31,10 @@ export class RegisterComponent {
 
   createForm(): void {
     this.userData = this.fb.group({
-      name: ['', [Validators.required]], // Added name field
-      username:['',Validators.required],
-      email: ['', [Validators.required, customEmailValidator()]],
-      phone: ['', [Validators.required]], // Added phone field
-      // password: ['', [Validators.required, noWhitespaceValidator('Password', 4, 20)]]
+      name: ['', [Validators.required, noWhitespaceValidator('Name',1,30)]], 
+      username:['', [Validators.required, noWhitespaceValidator('Username',1,30)]],
+      email: ['', [Validators.required, customEmailValidator(), noWhitespaceValidator('Email',5,30)]],
+      phone: ['', [Validators.required, noWhitespaceValidator('Phone number',10,10)]], 
 
       password: ['', [
         Validators.required,
@@ -65,15 +64,13 @@ export class RegisterComponent {
       phone:this.userData.value.phone,
       password:this.userData.value.password
      }
-     console.log(userRegister);
      this.userService.registerUser(userRegister).subscribe({
       next: () => {
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        // Log the entire error object for better debugging
-        console.error('Registration error:', err);
-        this.errorMessage = err.error.message || 'Registration failed';
+
+        this.errorMessage = err.error.message;
       }
     });
     } else {
