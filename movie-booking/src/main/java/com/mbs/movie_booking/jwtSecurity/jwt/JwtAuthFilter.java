@@ -1,4 +1,7 @@
-package com.mbs.movie_booking.security.jwt;
+package com.mbs.movie_booking.jwtSecurity.jwt;
+
+import static com.mbs.movie_booking.jwtSecurity.util.Constants.TOKEN_HEADER;
+import static com.mbs.movie_booking.jwtSecurity.util.Constants.TOKEN_PREFIX;
 
 import java.io.IOException;
 
@@ -7,13 +10,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import static com.mbs.movie_booking.security.util.Constants.TOKEN_HEADER;
-import static com.mbs.movie_booking.security.util.Constants.TOKEN_PREFIX;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -41,7 +40,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        // get username from token
         String username = tokenProvider.getUsernameFromToken(accessToken);
 
         if(username == null) {

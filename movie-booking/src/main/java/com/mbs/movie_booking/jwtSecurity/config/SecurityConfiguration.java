@@ -1,4 +1,4 @@
-package com.mbs.movie_booking.security.config;
+package com.mbs.movie_booking.jwtSecurity.config;
 
 import java.util.Collections;
 
@@ -17,8 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import com.mbs.movie_booking.security.jwt.JwtAuthEntryPoint;
-import com.mbs.movie_booking.security.jwt.JwtAuthFilter;
+import com.mbs.movie_booking.jwtSecurity.jwt.JwtAuthEntryPoint;
+import com.mbs.movie_booking.jwtSecurity.jwt.JwtAuthFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 
 public class SecurityConfiguration {
-public static final String SWAGGER_UI_URL = "/swagger-ui/**";
+    public static final String SWAGGER_UI_URL = "/swagger-ui/**";
     public static final String API_DOCS_URL = "/v3/api-docs/**";
     public static final String[] ALLOWED_URLS = {
             SWAGGER_UI_URL, API_DOCS_URL
@@ -40,6 +40,7 @@ public static final String SWAGGER_UI_URL = "/swagger-ui/**";
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -60,17 +61,16 @@ public static final String SWAGGER_UI_URL = "/swagger-ui/**";
                     authorize.requestMatchers("/api/auth/login").permitAll();
                     authorize.requestMatchers("/api/register").permitAll();
                     authorize.requestMatchers("/api/auth/refresh").permitAll();
-                   
+
                     authorize.anyRequest().authenticated();
                 });
         http
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
-//                .formLogin(login -> login.loginProcessingUrl("/api/auth/login"))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-    
+
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

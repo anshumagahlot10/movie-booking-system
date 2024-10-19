@@ -1,7 +1,5 @@
 package com.mbs.movie_booking.dto;
 
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.validation.constraints.*;
 
 import lombok.Data;

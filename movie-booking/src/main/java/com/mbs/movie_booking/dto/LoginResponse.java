@@ -1,5 +1,4 @@
-package com.mbs.movie_booking.security.dto;
-
+package com.mbs.movie_booking.dto;
 
 public record LoginResponse( 
     boolean isLogged,

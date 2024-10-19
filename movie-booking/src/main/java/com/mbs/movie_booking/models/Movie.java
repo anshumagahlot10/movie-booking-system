@@ -43,6 +43,5 @@ public class Movie {
     @Column(nullable = false)
     private String genre;
 
-    // Getters and Setters
 }
 

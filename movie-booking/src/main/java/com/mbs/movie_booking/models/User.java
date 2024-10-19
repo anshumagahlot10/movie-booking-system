@@ -58,7 +58,7 @@ public class User implements UserDetails {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")); // All users get a default role
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")); 
     }
 
 }

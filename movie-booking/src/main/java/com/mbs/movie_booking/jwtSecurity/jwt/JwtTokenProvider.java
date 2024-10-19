@@ -1,4 +1,4 @@
-package com.mbs.movie_booking.security.jwt;
+package com.mbs.movie_booking.jwtSecurity.jwt;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalUnit;

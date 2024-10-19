@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @SpringBootApplication
 @RequiredArgsConstructor
-public class MovieBookingApplication{
-
-
+public class MovieBookingApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MovieBookingApplication.class, args);

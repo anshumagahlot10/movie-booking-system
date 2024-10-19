@@ -1,6 +1,5 @@
 package com.mbs.movie_booking.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,11 +23,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody UserRegisterInfo userRegister) {
-
-        System.out.println(userRegister);
+    public void register(@Valid @RequestBody UserRegisterInfo userRegister) {
         userService.registerUser(userRegister);
-        return new ResponseEntity<String>(HttpStatus.CREATED);
     }
 
     @GetMapping("/user")

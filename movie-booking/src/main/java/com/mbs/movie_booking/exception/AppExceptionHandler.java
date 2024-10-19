@@ -1,4 +1,4 @@
-package com.mbs.movie_booking.security.exception;
+package com.mbs.movie_booking.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

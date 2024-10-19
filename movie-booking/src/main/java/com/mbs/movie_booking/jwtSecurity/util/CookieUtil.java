@@ -1,4 +1,4 @@
-package com.mbs.movie_booking.security.util;
+package com.mbs.movie_booking.jwtSecurity.util;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpCookie;

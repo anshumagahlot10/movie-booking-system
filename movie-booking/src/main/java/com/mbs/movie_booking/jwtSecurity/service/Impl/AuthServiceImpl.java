@@ -1,4 +1,4 @@
-package com.mbs.movie_booking.security.service.Impl;
+package com.mbs.movie_booking.jwtSecurity.service.Impl;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -16,18 +16,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.mbs.movie_booking.dto.LoginRequest;
+import com.mbs.movie_booking.dto.LoginResponse;
 import com.mbs.movie_booking.enums.TokenType;
+import com.mbs.movie_booking.exception.AppException;
+import com.mbs.movie_booking.exception.ResourceNotFoundException;
+import com.mbs.movie_booking.jwtSecurity.jwt.JwtTokenProvider;
+import com.mbs.movie_booking.jwtSecurity.service.AuthService;
+import com.mbs.movie_booking.jwtSecurity.util.CookieUtil;
 import com.mbs.movie_booking.models.Token;
 import com.mbs.movie_booking.models.User;
 import com.mbs.movie_booking.repository.TokenRepository;
 import com.mbs.movie_booking.repository.UserRepository;
-import com.mbs.movie_booking.security.dto.LoginRequest;
-import com.mbs.movie_booking.security.dto.LoginResponse;
-import com.mbs.movie_booking.security.exception.AppException;
-import com.mbs.movie_booking.security.exception.ResourceNotFoundException;
-import com.mbs.movie_booking.security.jwt.JwtTokenProvider;
-import com.mbs.movie_booking.security.service.AuthService;
-import com.mbs.movie_booking.security.util.CookieUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -53,22 +53,22 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<LoginResponse> login(LoginRequest loginRequest) {
 
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-    if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        
-        if (userDetails.getUsername().equals(loginRequest.email())) {
-            throw new RuntimeException("User is currently logged in.");
+        if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+            if (userDetails.getUsername().equals(loginRequest.email())) {
+                throw new RuntimeException("User is currently logged in.");
+            }
         }
-    }
 
         Authentication currAuth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginRequest.email(), loginRequest.password()));
         String email = loginRequest.email();
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new ResourceNotFoundException("User not found"));
-        HttpHeaders responseHeaders = new HttpHeaders(); // Prepares headers to send back the tokens in cookies.
+        HttpHeaders responseHeaders = new HttpHeaders(); 
         Token newAccessToken = null;
         Token newRefreshToken = null;
 
@@ -143,7 +143,6 @@ public class AuthServiceImpl implements AuthService {
             tokenRepository.deleteAllTokensByUserId(user.getUserID());
         }
 
-        // Clear security context
         SecurityContextHolder.clearContext();
 
         HttpHeaders responseHeaders = new HttpHeaders();

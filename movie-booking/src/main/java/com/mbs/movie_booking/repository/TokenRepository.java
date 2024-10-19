@@ -13,6 +13,7 @@ import com.mbs.movie_booking.models.Token;
 public interface TokenRepository extends JpaRepository<Token, Long> {
 
     Optional<Token> findByValue(String token);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM Token t WHERE t.user.username = ?1 AND t.type = ?2")
@@ -23,4 +24,3 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     @Query("DELETE FROM Token t WHERE t.user.id = ?1")
     void deleteAllTokensByUserId(Long userId);
 }
-
